@@ -1,0 +1,28 @@
+# Dependencies
+**/node_modules/
+
+# Hardhat / build artifacts
+**/artifacts/
+**/cache/
+**/typechain-types/
+**/coverage/
+**/coverage.json
+
+# OpenZeppelin upgrades manifests (project-specific deployments)
+**/.openzeppelin/
+
+# Environment / secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+**/*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
