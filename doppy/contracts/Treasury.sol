@@ -99,9 +99,9 @@ contract Treasury is
         tokens.push(_doppy);
         tokens.push(_bnh);
         tokens.push(_usdt);
-        maxTokenTransferPerDay.push(200 * 10**18);
-        maxTokenTransferPerDay.push(100 * 10**18);
-        maxTokenTransferPerDay.push(2000 * 10**18);
+        maxTokenTransferPerDay.push(10 * 10**18);
+        maxTokenTransferPerDay.push(10 * 10**18);
+        maxTokenTransferPerDay.push(10 * 10**18);
 
         signer = _signer;
 
