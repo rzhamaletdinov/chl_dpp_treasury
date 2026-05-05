@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require("hardhat");
 
-const REQUIRED_ENV = ["CASES", "GLASSES", "SIGNER", "DOPPY", "BNH", "USDT"];
+const REQUIRED_ENV = ["SIGNER", "DOPPY", "BNH", "USDT"];
 
 function readInitializeArgs() {
   const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
@@ -10,8 +10,8 @@ function readInitializeArgs() {
         `Copy .env.example to .env and fill them in.`
     );
   }
-  const { CASES, GLASSES, SIGNER, DOPPY, BNH, USDT } = process.env;
-  return [CASES, GLASSES, SIGNER, DOPPY, BNH, USDT];
+  const { SIGNER, DOPPY, BNH, USDT } = process.env;
+  return [SIGNER, DOPPY, BNH, USDT];
 }
 
 async function main() {
