@@ -5,7 +5,7 @@
 ## Подпроекты
 
 - [`cheelee/`](./cheelee) — Hardhat-проект с контрактом `Treasury` (signature-based withdrawal vault) и его развёрткой под `TransparentUpgradeableProxy` на BNB Smart Chain. Подробности, адреса прокси и имплементации, инструкции по сборке/деплою — в [`cheelee/README.md`](./cheelee/README.md).
-- [`doppy/`](./doppy) — параллельный Hardhat-проект Treasury для Doppy (`DOPPY` / `BNH` / `USDT` вместо `LEE` / `CHEEL` / `USDT`). Адрес владельца ещё не утверждён и помечен как TODO в [`doppy/contracts/Treasury.sol`](./doppy/contracts/Treasury.sol); до подстановки реального мультисига деплой намеренно невозможен. Подробности — в [`doppy/README.md`](./doppy/README.md).
+- [`doppy/`](./doppy) — параллельный Hardhat-проект Treasury для Doppy: **ERC20-only форк** Cheelee Treasury (`DOPPY` / `BNH` / `USDT` вместо `LEE` / `CHEEL` / `USDT`), вся NFT-функциональность намеренно удалена. Адрес владельца ещё не утверждён и помечен как TODO в [`doppy/contracts/Treasury.sol`](./doppy/contracts/Treasury.sol); до подстановки реального мультисига деплой намеренно невозможен. Подробности — в [`doppy/README.md`](./doppy/README.md).
 
 ## Структура репозитория
 

@@ -6,15 +6,11 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-
-import "./interfaces/CustomNFT.sol";
 
 /// @title Treasury
 /// @title Smart contract used to transfer tokens from inner to outter wallet
 contract Treasury is
     EIP712Upgradeable,
-    ERC721HolderUpgradeable,
     OwnableUpgradeable
 {
     event Withdrawed(
@@ -22,27 +18,15 @@ contract Treasury is
         uint256 amount,
         uint256 indexed option
     );
-    event WithdrawedNFT(
-        address indexed user,
-        uint256 id,
-        uint256 indexed option
-    );
     event SetSigner(address signer);
     event SetTokenLimit(uint256 index, uint256 newLimit);
-    event SetNftLimit(uint256 index, uint256 newLimit);
     event AddToken(address addr, uint256 limit);
-    event AddNFT(address addr, uint256 limit);
     event DisableToken(uint256 index);
-    event DisableNFT(uint256 index);
     event WithdrawToken(address token, uint256 amount);
 
     string public constant NAME = "TREASURY";
     string public constant EIP712_VERSION = "1";
 
-    bytes32 public constant NFT_PASS_TYPEHASH =
-        keccak256(
-            "WithdrawNFTSignature(uint256 nonce,uint256 id,address address_to,uint256 ttl,uint256 option)"
-        );
     bytes32 public constant PASS_TYPEHASH =
         keccak256(
             "WithdrawSignature(uint256 nonce,uint256 amount,address address_to,uint256 ttl,uint256 option)"
@@ -53,9 +37,6 @@ contract Treasury is
     //who              //when             //option   //amount
     mapping(address => mapping(uint256 => mapping(uint256 => uint256)))
         public tokensTransfersPerDay;
-    mapping(address => mapping(uint256 => mapping(uint256 => uint256)))
-        public nftTransfersPerDay;
-    uint256[] public maxNftTransfersPerDay;
     uint256[] public maxTokenTransferPerDay;
 
     address public signer;
@@ -65,7 +46,6 @@ contract Treasury is
     // mainnet/testnet deploy is impossible until the address is set.
     address public constant GNOSIS = address(0);
     IERC20Upgradeable[] public tokens;
-    CustomNFT[] public nfts;
     uint256[50] __gap;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -74,8 +54,6 @@ contract Treasury is
     }
     
     function initialize(
-        CustomNFT _cases,
-        CustomNFT _glasses,
         address _signer,
         IERC20Upgradeable _doppy,
         IERC20Upgradeable _bnh,
@@ -83,18 +61,11 @@ contract Treasury is
     ) external initializer {
         __Ownable_init();
 
-        require(address(_cases) != address(0), "Can't set zero address");
-        require(address(_glasses) != address(0), "Can't set zero address");
         require(address(_doppy) != address(0), "Can't set zero address");
         require(address(_bnh) != address(0), "Can't set zero address");
         require(address(_usdt) != address(0), "Can't set zero address");
 
         __EIP712_init(NAME, EIP712_VERSION);
-
-        nfts.push(_cases);
-        nfts.push(_glasses);
-        maxNftTransfersPerDay.push(5);
-        maxNftTransfersPerDay.push(5);
 
         tokens.push(_doppy);
         tokens.push(_bnh);
@@ -120,23 +91,6 @@ contract Treasury is
         bytes32 _digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(PASS_TYPEHASH, _nonce, _amount, _to, _ttl, _option)
-            )
-        );
-        return ECDSAUpgradeable.recover(_digest, _signature);
-    }
-
-    /// @notice Used to verify NFT withdrawal signature
-    function verifySignatureNFT(
-        uint256 _nonce,
-        uint256 _id,
-        address _to,
-        uint256 _ttl,
-        uint256 _option,
-        bytes memory _signature
-    ) public view virtual returns (address) {
-        bytes32 _digest = _hashTypedDataV4(
-            keccak256(
-                abi.encode(NFT_PASS_TYPEHASH, _nonce, _id, _to, _ttl, _option)
             )
         );
         return ECDSAUpgradeable.recover(_digest, _signature);
@@ -174,38 +128,6 @@ contract Treasury is
         emit Withdrawed(_to, _amount, _option);
     }
 
-    /// @notice Withdraw NFT using signature
-    function withdrawNFT(
-        uint256 _nonce,
-        uint256 _id,
-        address _to,
-        uint256 _ttl,
-        uint256 _option,
-        bytes memory _signature
-    ) external virtual {
-        require(address(nfts[_option]) != address(0), "Option disabled");
-        uint256 currentDay = getCurrentDay();
-        require(
-            nftTransfersPerDay[_to][currentDay][_option] <
-                maxNftTransfersPerDay[_option],
-            "Too many transfers"
-        );
-        nftTransfersPerDay[_to][currentDay][_option]++;
-
-        require(_ttl >= block.timestamp, "Signature is no longer active");
-        require(
-            verifySignatureNFT(_nonce, _id, _to, _ttl, _option, _signature) ==
-                signer,
-            "Bad Signature"
-        );
-        require(!usedSignature[_nonce], "Signature already used");
-
-        usedSignature[_nonce] = true;
-        nfts[_option].receiveNFT(_to, _id);
-
-        emit WithdrawedNFT(_to, _id, _option);
-    }
-
     /// @notice Function returns current day in format:
     /// 1 - monday
     /// 2 - tuesday
@@ -231,13 +153,6 @@ contract Treasury is
         emit SetTokenLimit(_index, _newLimit);
     }
 
-    /// @notice Set limit for NFT withdrawals
-    function setNftLimit(uint256 _index, uint256 _newLimit) external onlyOwner {
-        maxNftTransfersPerDay[_index] = _newLimit;
-
-        emit SetNftLimit(_index, _newLimit);
-    }
-
     /// @notice Add support for new erc20 token
     function addToken(IERC20Upgradeable _addr, uint256 _limit)
         external
@@ -250,27 +165,11 @@ contract Treasury is
         emit AddToken(address(_addr), _limit);
     }
 
-    /// @notice Add support for new NFT
-    function addNFT(CustomNFT _addr, uint256 _limit) external onlyOwner {
-        require(address(_addr) != address(0), "Zero address not acceptable");
-        nfts.push(_addr);
-        maxNftTransfersPerDay.push(_limit);
-
-        emit AddNFT(address(_addr), _limit);
-    }
-
     /// @notice Disable erc20 token by index
     function disableToken(uint256 _index) external onlyOwner {
         tokens[_index] = IERC20Upgradeable(address(0));
 
         emit DisableToken(_index);
-    }
-
-    /// @notice Disable nft by index
-    function disableNFT(uint256 _index) external onlyOwner {
-        nfts[_index] = CustomNFT(address(0));
-
-        emit DisableNFT(_index);
     }
 
     /// @notice Withdraw tokens for owner
