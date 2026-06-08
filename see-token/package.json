@@ -1,0 +1,23 @@
+{
+  "name": "see-token",
+  "version": "0.1.0",
+  "description": "Hardhat project for the SEE token (upgradeable BEP-20 behind a TransparentUpgradeableProxy). Reuses the DOPPY token template logic; differs only in name/symbol and owner multisig.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "clean": "hardhat clean",
+    "deploy:bsc": "hardhat run scripts/deploy.js --network bsc",
+    "deploy:bscTestnet": "hardhat run scripts/deploy.js --network bscTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6",
+    "@openzeppelin/contracts-upgradeable": "4.7.3"
+  }
+}
