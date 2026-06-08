@@ -48,7 +48,7 @@ This is a faithful logic copy. The only changes are:
 | abstract template | `DoppyToken` / `__DoppyToken_init` | `SeeToken` / `__SeeToken_init` |
 | interface | `IDoppyToken` | `ISeeToken` |
 | owner constant | `GNOSIS_WALLET` | `SEE_MULTISIG` |
-| `name` | `"Dreams, Optimism, Playfulness & You"` | TODO(see) — placeholder `"SEE"` |
+| `name` | `"Dreams, Optimism, Playfulness & You"` | `"SEE"` (no descriptive long name) |
 | `symbol` | `"DOPPY"` | `"SEE"` |
 | `MAX_SUPPLY` | `30 * 10**9 * 10**18` | `30 * 10**9 * 10**18` (same) |
 
@@ -68,8 +68,9 @@ the `doppy/`/`pulsee/` Treasury projects, which use 0.8.17 / optimizer off):
 1. Set **`SEE_MULTISIG`** in `contracts/SEE.sol` to the real SEE owner multisig.
    While it is `address(0)` (the `TODO(see)` placeholder), `initialize` reverts
    and no deploy is possible — an intentional safety fuse.
-2. Set the final **SEE display name** in the `__SeeToken_init(...)` call in
-   `contracts/SEE.sol`. The EIP-712 permit domain binds to this `name`.
+
+The token **`name`/`symbol`** are intentionally both `"SEE"` (no descriptive long
+name like DOPPY's) and are already final — nothing to set there before deploy.
 
 ## Build & deploy
 
