@@ -17,9 +17,9 @@ contract SEE is SeeToken {
     }
 
     function initialize() external initializer {
-        // TODO(see): set the final SEE display name (analog of DOPPY's
-        // "Dreams, Optimism, Playfulness & You"). Placeholder "SEE" for now;
-        // the EIP-712 permit domain binds to this name, so set it before deploy.
+        // SEE has no descriptive long name (unlike DOPPY's "Dreams, Optimism,
+        // Playfulness & You"): both name and symbol are simply "SEE". This is
+        // the final value; the EIP-712 permit domain binds to this name.
         __SeeToken_init("SEE", "SEE");
         transferOwnership(SEE_MULTISIG);
     }
